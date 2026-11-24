@@ -1,0 +1,11 @@
+name: Hallo Radhaus
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  hallo:
+    runs-pm_ ubunutu-latest
+    steps:
+      - run: echo "hallo ${{ github.actor }}"
