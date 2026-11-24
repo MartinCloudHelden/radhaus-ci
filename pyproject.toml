@@ -1,0 +1,5 @@
+[tool.coverage.report]
+# Startblock wird nur beim direkten Aufruf ausgeführt, nicht in den Tests
+exclude_also = [
+    "if __name__ == .__main__.:",
+]

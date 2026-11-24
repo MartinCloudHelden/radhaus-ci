@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Zusatz 3: jede Nacht um 1:00 UTC (2:00 Uhr deutsche Winterzeit) und per Knopf
+  schedule:
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+# Aufgabe 5: das GITHUB_TOKEN darf nur lesen
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    # Zusatz 2: drei Python-Versionen parallel
+    strategy:
+      matrix:
+        python: ['3.12', '3.13', '3.14']
+    steps:
+      - uses: actions/checkout@v7
+      # Aufgabe 5: per Commit-SHA gepinnt
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install -r requirements-dev.txt
+      # Zusatz 1: Coverage als Gate
+      - run: python -m pytest -q --cov=shop --cov-report=term-missing --cov-fail-under=90
+
+  # Aufgabe 4: läuft parallel zu test
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.13'
+      - run: python -m pip install -r requirements-dev.txt
+      - run: ruff check .
+
+  # Aufgabe 4: startet erst, wenn test und lint grün sind
+  startcheck:
+    needs: [test, lint]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.13'
+      - run: python -m shop.versand

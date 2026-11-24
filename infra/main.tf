@@ -19,8 +19,8 @@ variable "umgebung" {
 }
 
 resource "local_file" "shop_konfiguration" {
-  filename = "${path.module}/shop-${var.umgebung}.conf"
-  content = <<-KONFIG
+  filename        = "${path.module}/shop-${var.umgebung}.conf"
+  content         = <<-KONFIG
     umgebung=${var.umgebung}
     versandfrei_ab=50.00
     versandpauschale=4.90
